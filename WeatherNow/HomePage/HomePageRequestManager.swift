@@ -16,4 +16,11 @@ class HomePageRequestManager{
         apiRoute.addQueryParameter(key: "q", value: cityName)
         RestManager.shared.sendRequest(apiRoute, completion: completion)
     }
+    
+    func getAllDayForecast(cityName:String,day:String,completion: @escaping(Result<AllDayForecast,AFError>) -> Void){
+        var apiRoute = GetAllDayWeather()
+        apiRoute.addQueryParameter(key: "q", value: cityName)
+        apiRoute.addQueryParameter(key: "days", value: day)
+        RestManager.shared.sendRequest(apiRoute, completion: completion)
+    }
 }

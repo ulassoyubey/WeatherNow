@@ -10,11 +10,12 @@ import Alamofire
 
 protocol HomePageInteractorProcotol {
     func fetchCurrentWeather(with name:String)
-    //func fetchNumberDayForecast(with name:String,day:Int)
+    func fetchNumberDayForecast(with name:String,day:String)
 }
 
 protocol HomePageInteractorOutput: AnyObject {
     func handleCurrentWeather(_ result: Result<HourlyForecast,AFError>)
+    func handleNumberDayForecast(_ result: Result<AllDayForecast,AFError>)
     //func handleDailyForecast()
 }
 
@@ -37,6 +38,18 @@ class HomePageInteractor: HomePageInteractorProcotol {
                 self.output?.handleCurrentWeather(.success(forecast))
             case .failure(let error):
                 self.output?.handleCurrentWeather(.failure(error))
+            }
+        }
+    }
+    
+    func fetchNumberDayForecast(with name: String, day: String) {
+        requestManager.getAllDayForecast(cityName: name, day: day) { [weak self] result in
+            guard let self = self else { return }
+            switch result {
+            case .success(let alldayForecast):
+                self.output?.handleNumberDayForecast(.success(alldayForecast))
+            case .failure(let error):
+                self.output?.handleNumberDayForecast(.failure(error))
             }
         }
     }

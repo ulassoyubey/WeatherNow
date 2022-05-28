@@ -28,7 +28,7 @@ class WeatherImageView: UIImageView {
     }
     
     func downloadImage(fromUrl imageUrl: String){
-        print(imageUrl)
+        //print(imageUrl)
         if let imageURL = URL(string: imageUrl), let placeholder = UIImage(named: "default") {
             self.af.setImage(withURL: imageURL, placeholderImage: placeholder)
         }

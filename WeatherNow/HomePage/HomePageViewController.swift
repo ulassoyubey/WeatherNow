@@ -20,6 +20,7 @@ protocol HomePageViewProtocol:AnyObject {
     func setHumidityFieldText(topLabelText:String,descLabelText:String)
     func setVisibilityTextFiled(topLabelText: String, descLabelText: String)
     func updateImage()
+    func configureCollectionView()
 }
 
 class HomePageViewController: UIViewController,HomePageViewProtocol {
@@ -33,7 +34,7 @@ class HomePageViewController: UIViewController,HomePageViewProtocol {
     let humidityField = BottomSheetInformationView()
     let visibilityField = BottomSheetInformationView()
     let weatherImage = WeatherImageView(frame: .zero)
-
+    var forecastCollectionView:UICollectionView!
     var presenter: HomePagePresenter?
         
 
@@ -44,6 +45,7 @@ class HomePageViewController: UIViewController,HomePageViewProtocol {
         view.backgroundColor = .white
         presenter?.viewDidLoad()
         setImage()
+
     }
     
     func configureNavBar(cityName:String) {
@@ -123,7 +125,7 @@ class HomePageViewController: UIViewController,HomePageViewProtocol {
             informationStackView.topAnchor.constraint(equalTo: todayLabel.bottomAnchor,constant: 15),
             informationStackView.leadingAnchor.constraint(equalTo: grayContainerView.leadingAnchor,constant: 5),
             informationStackView.trailingAnchor.constraint(equalTo: grayContainerView.trailingAnchor,constant: 5),
-            informationStackView.heightAnchor.constraint(equalToConstant: 100)
+            informationStackView.heightAnchor.constraint(equalToConstant: 50)
         ])
     }
     
@@ -137,5 +139,54 @@ class HomePageViewController: UIViewController,HomePageViewProtocol {
     func setVisibilityTextFiled(topLabelText: String, descLabelText: String) {
         visibilityField.setLabels(topLabelText: topLabelText, descLabelText: descLabelText)
     }
+    
+    func configureCollectionView() {
+        let layout = UICollectionViewFlowLayout()
+        forecastCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        forecastCollectionView.delegate = self
+        forecastCollectionView.dataSource = self
+        layout.scrollDirection = .horizontal
+        forecastCollectionView.backgroundColor = .clear
+        forecastCollectionView.showsHorizontalScrollIndicator = false
+        forecastCollectionView.register(ForecastCellCollectionViewCell.self, forCellWithReuseIdentifier: ForecastCellCollectionViewCell.reuseId)
+        view.addSubview(forecastCollectionView)
+        forecastCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            forecastCollectionView.topAnchor.constraint(equalTo: informationStackView.bottomAnchor, constant: 20),
+            forecastCollectionView.leadingAnchor.constraint(equalTo: grayContainerView.leadingAnchor),
+            forecastCollectionView.trailingAnchor.constraint(equalTo: grayContainerView.trailingAnchor),
+            forecastCollectionView.heightAnchor.constraint(equalToConstant: 100)
+        ])
+    }
 
+
+}
+
+extension HomePageViewController:UICollectionViewDelegate {
+    
+}
+
+extension HomePageViewController:UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return .init(width: (view.frame.width / 3) - 40, height: 100)
+    }
+
+}
+
+extension HomePageViewController:UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if let count = presenter?.getForecastCount() {
+            return count
+        }else {
+            return 0
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ForecastCellCollectionViewCell.reuseId, for: indexPath) as! ForecastCellCollectionViewCell
+        if let allday = presenter?.getWeatherAtIndex(index: indexPath.item) {
+            cell.setCells(forecast: allday)
+        }
+        return cell
+    }
 }

@@ -1,15 +1,15 @@
 //
-//  HourlyForeCastApiRoute.swift
+//  AllDayForecastApiRoute.swift
 //  WeatherNow
 //
-//  Created by ulas soyubey on 25.05.2022.
+//  Created by ulas soyubey on 28.05.2022.
 //
 
 import Foundation
 import Alamofire
 
-struct GetCurrentWeather : APIRouteable {
-    var path: String = "current.json"
+struct GetAllDayWeather: APIRouteable {
+    var path: String = "forecast.json"
     
     var method: HTTPMethod = .get
     
